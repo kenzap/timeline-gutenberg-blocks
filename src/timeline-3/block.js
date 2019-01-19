@@ -1,0 +1,292 @@
+/**
+ * BLOCK: timeline-3
+ *
+ */
+
+//  Import CSS.
+import './style.scss';
+import './editor.scss';
+
+const { __ } = wp.i18n;
+const { registerBlockType } = wp.blocks;
+const { RichText } = wp.editor;
+
+import { blockProps, ContainerSave } from '../commonComponents/container/container';
+import Edit from './edit';
+
+/**
+ * Provides the initial data for new block
+ */
+export const defaultItem = {
+    title: __( 'New event', 'kenzap-timeline' ),
+    description: __( 'Lorem ipsum dolor sitam et consectetuer adipisci elit lorem ipsum dolor sit amet.', 'kenzap-timeline' ),
+    time: 'March 2019',
+};
+
+export const defaultSubBlocks = JSON.stringify( [
+    {
+        title: __( 'Welcome Dinner', 'kenzap-timeline' ),
+        description: __( 'Lorem ipsum dolor sitam et consectetuer adipisci elit lorem ipsum dolor sit amet.', 'kenzap-timeline' ),
+        time: 'March 2019',
+        key: new Date().getTime() + 1,
+    },
+    {
+        title: __( 'Office Relocation', 'kenzap-timeline' ),
+        description: __( 'Lorem ipsum dolor sitam et consectetuer adipisci elit lorem ipsum dolor sit amet.', 'kenzap-timeline' ),
+        time: 'September 2019',
+        key: new Date().getTime() + 2,
+    },
+    {
+        title: __( 'New Release', 'kenzap-timeline' ),
+        description: __( 'Lorem ipsum dolor sitam et consectetuer adipisci elit lorem ipsum dolor sit amet.', 'kenzap-timeline' ),
+        time: 'December 2019',
+        key: new Date().getTime() + 3,
+    },
+    {
+        title: __( 'Corporate Meetup', 'kenzap-timeline' ),
+        description: __( 'Lorem ipsum dolor sitam et consectetuer adipisci elit lorem ipsum dolor sit amet.', 'kenzap-timeline' ),
+        time: 'January 2020',
+        key: new Date().getTime() + 4,
+    },
+    {
+        title: __( 'New Cofounders', 'kenzap-timeline' ),
+        description: __( 'Lorem ipsum dolor sitam et consectetuer adipisci elit lorem ipsum dolor sit amet.', 'kenzap-timeline' ),
+        time: 'February 2020',
+        key: new Date().getTime() + 5,
+    },
+    {
+        title: __( 'Sending Around', 'kenzap-timeline' ),
+        description: __( 'Lorem ipsum dolor sitam et consectetuer adipisci elit lorem ipsum dolor sit amet.', 'kenzap-timeline' ),
+        time: 'May 2020',
+        key: new Date().getTime() + 6,
+    },
+    {
+        title: __( 'Building New Office', 'kenzap-timeline' ),
+        description: __( 'Lorem ipsum dolor sitam et consectetuer adipisci elit lorem ipsum dolor sit amet.', 'kenzap-timeline' ),
+        time: 'August 2020',
+        key: new Date().getTime() + 7,
+    },
+    {
+        title: __( 'Trip to China', 'kenzap-timeline' ),
+        description: __( 'Lorem ipsum dolor sitam et consectetuer adipisci elit lorem ipsum dolor sit amet.', 'kenzap-timeline' ),
+        time: 'January 2021',
+        key: new Date().getTime() + 8,
+    },
+] );
+
+/**
+ * Generate inline styles for custom settings of the block
+ * @param {Object} attributes - of the block
+ * @returns {Node} generated styles
+ */
+export const getStyles = attributes => {
+    const kenzapContanerStyles = {
+        maxWidth: `${ attributes.containerMaxWidth === '100%' ? '100%' : attributes.containerMaxWidth + 'px' }`,
+        '--maxWidth': `${ attributes.containerMaxWidth === '100%' ? '100wh' : attributes.containerMaxWidth + ' ' } `,
+    };
+
+    const vars = {
+        '--paddings': `${ attributes.containerPadding }`,
+        '--paddingsMin': `${ attributes.containerPadding / 4 }`,
+        '--paddingsMinPx': `${ attributes.containerPadding / 4 }px`,
+        '--timeLineColor': attributes.timeLineColor,
+        '--boxBackground': attributes.boxBackground,
+    };
+
+    let additionalClassForOwlContainer = 'kenzap-lg-carousel';
+    if ( attributes.containerMaxWidth < 992 ) {
+        additionalClassForOwlContainer = 'kenzap-md-carousel';
+    }
+    if ( attributes.containerMaxWidth < 768 ) {
+        additionalClassForOwlContainer = 'kenzap-sm-carousel';
+    }
+    if ( attributes.containerMaxWidth < 480 ) {
+        additionalClassForOwlContainer = 'kenzap-xs-carousel';
+    }
+
+    if ( attributes.width100 ) {
+        additionalClassForOwlContainer = 'kenzap-lg-carousel';
+    }
+
+    return {
+        vars,
+        kenzapContanerStyles,
+        additionalClassForOwlContainer,
+    };
+};
+
+/**
+ * Register: a Gutenberg Block.
+ *
+ * Registers a new block provided a unique name and an object defining its
+ * behavior. Once registered, the block is made editor as an option to any
+ * editor interface where blocks are implemented.
+ *
+ * @link https://wordpress.org/gutenberg/handbook/block-api/
+ * @param  {string}   name     Block name.
+ * @param  {Object}   settings Block settings.
+ * @return {?WPBlock}          The block, if it has been successfully
+ *                             registered; otherwise `undefined`.
+ */
+registerBlockType( 'kenzap/timeline-3', {
+    title: __( 'Kenzap timeline 3', 'kenzap-timeline' ),
+    icon: 'calendar-alt',
+    category: 'layout',
+    keywords: [
+        __( 'timeline', 'kenzap-timeline' ),
+    ],
+    anchor: true,
+    html: true,
+    attributes: {
+        ...blockProps,
+
+        backgroundColor: {
+            type: 'string',
+            default: '#171819',
+        },
+
+        titleSize: {
+            type: 'number',
+            default: 20,
+        },
+
+        descriptionSize: {
+            type: 'number',
+            default: 14,
+        },
+
+        timeSize: {
+            type: 'number',
+            default: 20,
+        },
+
+        textColor: {
+            type: 'string',
+            default: '#fff',
+        },
+
+        timeLineColor: {
+            type: 'string',
+            default: '#aceb2f',
+        },
+
+        boxBackground: {
+            type: 'string',
+            default: '#242424',
+        },
+
+        items: {
+            type: 'array',
+            default: [],
+        },
+
+        highlightedRecords: {
+            type: 'number',
+            default: 5,
+        },
+
+        isFirstLoad: {
+            type: 'boolean',
+            default: true,
+        },
+
+        blockUniqId: {
+            type: 'number',
+            default: 0,
+        },
+    },
+
+    edit: ( props ) => {
+        if ( props.attributes.items.length === 0 && props.attributes.isFirstLoad ) {
+            props.setAttributes( {
+                items: [ ...JSON.parse( defaultSubBlocks ) ],
+                isFirstLoad: false,
+            } );
+            // TODO It is very bad solution to avoid low speed working of setAttributes function
+            props.attributes.items = JSON.parse( defaultSubBlocks );
+            if ( ! props.attributes.blockUniqId ) {
+                props.setAttributes( {
+                    blockUniqId: new Date().getTime(),
+                } );
+            }
+        }
+
+        return ( <Edit { ...props } /> );
+    },
+
+    /**
+     * The save function defines the way in which the different attributes should be combined
+     * into the final markup, which is then serialized by Gutenberg into post_content.
+     *
+     * The "save" property must be specified and must be a valid function.
+     * @param {Object} props - attributes
+     * @returns {Node} rendered component
+     */
+    save: function( props ) {
+        const {
+            className,
+            attributes,
+        } = props;
+
+        const { vars, kenzapContanerStyles, additionalClassForOwlContainer } = getStyles( props.attributes );
+
+        return (
+            <div className={ className ? className : '' } style={ vars }>
+                <ContainerSave
+                    className={ `kenzap-timeline-3 block-${ attributes.blockUniqId }` }
+                    attributes={ attributes }
+                    style={ vars }
+                    withBackground
+                    withPadding
+                >
+                    <div className="kenzap-container" style={ kenzapContanerStyles }>
+                        <div className={ `timeline owl-carousel ${ additionalClassForOwlContainer }` }>
+                            { attributes.items && attributes.items.map( ( item, index ) => (
+                                <div
+                                    key={ item.key }
+                                    className={ `timeline-content ${ attributes.highlightedRecords > index ? 'past-time' : '' } ${ attributes.highlightedRecords == index+1 ? 'past-time-last' : '' }` }
+                                >
+                                    <div className="time-wrapper">
+                                        <div className="time">
+                                            <RichText.Content
+                                                tagName="p"
+                                                value={ item.time }
+                                                style={ {
+                                                    color: attributes.textColor,
+                                                    fontSize: `${ attributes.timeSize }px`,
+                                                    lineHeight: `${ attributes.timeSize }px`,
+                                                } }
+                                            />
+                                        </div>
+                                    </div>
+                                    <div className="info-wrapper">
+                                        <div className="info">
+                                            <RichText.Content
+                                                tagName="h3"
+                                                value={ item.title }
+                                                style={ {
+                                                    color: attributes.textColor,
+                                                    fontSize: `${ attributes.titleSize }px`,
+                                                    lineHeight: `${ attributes.titleSize }px`,
+                                                } }
+                                            />
+                                            <RichText.Content
+                                                tagName="p"
+                                                value={ item.description }
+                                                style={ {
+                                                    color: attributes.textColor,
+                                                    fontSize: `${ attributes.descriptionSize }px`,
+                                                    lineHeight: `${ attributes.descriptionSize * 1.8 }px`,
+                                                } }
+                                            />
+                                        </div>
+                                    </div>
+                                </div>
+                            ) ) }
+                        </div>
+                    </div>
+                </ContainerSave>
+            </div>
+        );
+    },
+} );
