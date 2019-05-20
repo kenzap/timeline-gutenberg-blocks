@@ -1,11 +1,10 @@
-const { __ } = wp.i18n; // Import __() from wp.i18n
+const { __ } = wp.i18n; 
 const { Component } = wp.element;
-const { RichText, InspectorControls, PanelColorSettings } = wp.editor;
+const { RichText, InspectorControls, PanelColorSettings, InnerBlocks } = wp.editor;
 const { RangeControl, PanelBody, CheckboxControl } = wp.components;
-
-import { defaultItem, getStyles } from './block';
-
+import { defaultItem, typographyArr, getStyles } from './block';
 import { InspectorContainer, ContainerEdit } from '../commonComponents/container/container';
+import { TypographyContainer, getTypography } from '../commonComponents/typography/typography';
 import { Plus } from '../commonComponents/icons/plus';
 
 /**
@@ -94,27 +93,13 @@ export default class Edit extends Component {
                         initialOpen={ false }
                     >
                         <CheckboxControl
-                            label={__( 'Animation', 'kenzap-timeline' )}
-                            help={ __( 'Enable/disable animation on hover event', 'kenzap-timeline' ) }
+                            label={__( 'Hover animation', 'kenzap-timeline' )}
                             checked={ attributes.withAnimation }
                             onChange={ ( withAnimation ) => {
                                 setAttributes( { withAnimation } );
                             } }
                         />
-                        <RangeControl
-                            label={ __( 'Title size', 'kenzap-timeline' ) }
-                            value={ attributes.titleSize }
-                            onChange={ ( titleSize ) => setAttributes( { titleSize } ) }
-                            min={ 10 }
-                            max={ 130 }
-                        />
-                        <RangeControl
-                            label={ __( 'Time size', 'kenzap-timeline' ) }
-                            value={ attributes.timeSize }
-                            onChange={ ( timeSize ) => setAttributes( { timeSize } ) }
-                            min={ 10 }
-                            max={ 130 }
-                        />
+
                         <RangeControl
                             label={ __( 'Border radius event', 'kenzap-timeline' ) }
                             value={ attributes.borderRadius }
@@ -122,6 +107,7 @@ export default class Edit extends Component {
                             min={ 0 }
                             max={ 60 }
                         />
+
                         <PanelColorSettings
                             title={ __( 'Colors', 'kenzap-timeline' ) }
                             initialOpen={ false }
@@ -131,26 +117,25 @@ export default class Edit extends Component {
                                     onChange: ( value ) => {
                                         return setAttributes( { textColor: value } );
                                     },
-                                    label: __( 'Text color', 'kenzap-timeline' ),
-                                },
-                                {
-                                    value: attributes.timeLineColor,
-                                    onChange: ( timeLineColor ) => {
-                                        return setAttributes( { timeLineColor } );
-                                    },
-                                    label: __( 'Element and circle color', 'kenzap-timeline' ),
+                                    label: __( 'Featured', 'kenzap-timeline' ),
                                 },
                             ] }
                         />
                         <RangeControl
-                            label={ __( 'Featured', 'kenzap-timeline' ) }
+                            label={ __( 'Featured element', 'kenzap-timeline' ) }
                             value={ attributes.activeRecord }
                             onChange={ ( activeRecord ) => setAttributes( { activeRecord } ) }
                             min={ 1 }
                             max={ attributes.items.length }
-                            help={ __( 'Mark a record which one will be highlighted as featured of the timeline.', 'kenzap-timeline' ) }
                         />
                     </PanelBody>
+
+                    <TypographyContainer
+                        setAttributes={ setAttributes }
+                        typographyArr={ typographyArr }
+                        { ...attributes }
+                    />
+
                     <InspectorContainer
                         setAttributes={ setAttributes }
                         { ...attributes }
@@ -168,6 +153,7 @@ export default class Edit extends Component {
                         withPadding
                     >
                         <div className="kenzap-container" style={ kenzapContanerStyles }>
+                            { attributes.nestedBlocks == 'top' && <InnerBlocks /> }
                             <div className={ `timeline owl-carousel owl-loaded ${ additionalClassForOwlContainer }` }>
                                 <div className="owl-stage-outer">
                                     <div className="owl-stage">
@@ -182,16 +168,13 @@ export default class Edit extends Component {
                                                     </button>
 
                                                     <div className="time-wrapper">
-                                                        <div className="time" style={ { color: attributes.textColor } }>
+                                                        <div className="time" >
                                                             <RichText
                                                                 tagName="p"
                                                                 placeholder={ __( 'Date', 'kenzap-timeline' ) }
                                                                 value={ item.time }
                                                                 onChange={ ( value ) => this.onChangePropertyItem( 'time', value, index, true ) }
-                                                                style={ {
-                                                                    fontSize: `${ attributes.timeSize }px`,
-                                                                    lineHeight: `${ attributes.timeSize }px`,
-                                                                } }
+                                                                style={ getTypography( attributes, 0 ) }
                                                             />
                                                         </div>
                                                     </div>
@@ -202,9 +185,7 @@ export default class Edit extends Component {
                                                                 placeholder={ __( 'Title', 'kenzap-timeline' ) }
                                                                 value={ item.title }
                                                                 onChange={ ( value ) => this.onChangePropertyItem( 'title', value, index, true ) }
-                                                                style={ {
-                                                                    fontSize: `${ attributes.titleSize }px`,
-                                                                } }
+                                                                style={ getTypography( attributes, 1 ) }
                                                             />
                                                         </div>
                                                     </div>
@@ -213,8 +194,8 @@ export default class Edit extends Component {
                                         ) ) }
                                     </div>
                                 </div>
-
                             </div>
+                            { attributes.nestedBlocks == 'bottom' && <InnerBlocks /> }
                         </div>
                         <div className="editPadding" />
                         <button

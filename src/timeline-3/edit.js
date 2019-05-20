@@ -1,11 +1,10 @@
-const { __ } = wp.i18n; // Import __() from wp.i18n
+const { __ } = wp.i18n;
 const { Component } = wp.element;
-const { RichText, InspectorControls, PanelColorSettings } = wp.editor;
+const { RichText, InspectorControls, PanelColorSettings, InnerBlocks } = wp.editor;
 const { RangeControl, PanelBody } = wp.components;
-
-import { defaultItem, getStyles } from './block';
-
+import { defaultItem, typographyArr, getStyles } from './block';
 import { InspectorContainer, ContainerEdit } from '../commonComponents/container/container';
+import { TypographyContainer, getTypography } from '../commonComponents/typography/typography';
 import { Plus } from '../commonComponents/icons/plus';
 
 /**
@@ -93,38 +92,11 @@ export default class Edit extends Component {
                         title={ __( 'General', 'kenzap-timeline' ) }
                         initialOpen={ false }
                     >
-                        <RangeControl
-                            label={ __( 'Title size', 'kenzap-timeline' ) }
-                            value={ attributes.titleSize }
-                            onChange={ ( titleSize ) => setAttributes( { titleSize } ) }
-                            min={ 10 }
-                            max={ 130 }
-                        />
-                        <RangeControl
-                            label={ __( 'Description size', 'kenzap-timeline' ) }
-                            value={ attributes.descriptionSize }
-                            onChange={ ( descriptionSize ) => setAttributes( { descriptionSize } ) }
-                            min={ 10 }
-                            max={ 130 }
-                        />
-                        <RangeControl
-                            label={ __( 'Time size', 'kenzap-timeline' ) }
-                            value={ attributes.timeSize }
-                            onChange={ ( timeSize ) => setAttributes( { timeSize } ) }
-                            min={ 10 }
-                            max={ 130 }
-                        />
+
                         <PanelColorSettings
                             title={ __( 'Colors', 'kenzap-timeline' ) }
                             initialOpen={ false }
                             colorSettings={ [
-                                {
-                                    value: attributes.textColor,
-                                    onChange: ( value ) => {
-                                        return setAttributes( { textColor: value } );
-                                    },
-                                    label: __( 'Text color', 'kenzap-timeline' ),
-                                },
                                 {
                                     value: attributes.timeLineColor,
                                     onChange: ( timeLineColor ) => {
@@ -150,6 +122,13 @@ export default class Edit extends Component {
                             help={ __( 'Mark how many records are highlighted as featured from the beginning of the timeline.', 'kenzap-timeline' ) }
                         />
                     </PanelBody>
+
+                    <TypographyContainer
+                        setAttributes={ setAttributes }
+                        typographyArr={ typographyArr }
+                        { ...attributes }
+                    />
+
                     <InspectorContainer
                         setAttributes={ setAttributes }
                         { ...attributes }
@@ -167,6 +146,7 @@ export default class Edit extends Component {
                         withPadding
                     >
                         <div className="kenzap-container" style={ kenzapContanerStyles }>
+                            { attributes.nestedBlocks == 'top' && <InnerBlocks /> }
                             <div className={ `timeline owl-carousel owl-loaded ${ additionalClassForOwlContainer }` }>
                                 <div className="owl-stage-outer">
                                     <div className="owl-stage">
@@ -181,17 +161,13 @@ export default class Edit extends Component {
                                                     </button>
 
                                                     <div className="time-wrapper">
-                                                        <div className="time" style={ { color: attributes.textColor } }>
+                                                        <div className="time" >
                                                             <RichText
                                                                 tagName="p"
                                                                 placeholder={ __( 'Date', 'kenzap-timeline' ) }
                                                                 value={ item.time }
                                                                 onChange={ ( value ) => this.onChangePropertyItem( 'time', value, index, true ) }
-                                                                style={ {
-                                                                    color: attributes.textColor,
-                                                                    fontSize: `${ attributes.timeSize }px`,
-                                                                    lineHeight: `${ attributes.timeSize }px`,
-                                                                } }
+                                                                style={ getTypography( attributes, 0 ) }
                                                             />
                                                         </div>
                                                     </div>
@@ -202,22 +178,14 @@ export default class Edit extends Component {
                                                                 placeholder={ __( 'Title', 'kenzap-timeline' ) }
                                                                 value={ item.title }
                                                                 onChange={ ( value ) => this.onChangePropertyItem( 'title', value, index, true ) }
-                                                                style={ {
-                                                                    color: attributes.textColor,
-                                                                    fontSize: `${ attributes.titleSize }px`,
-                                                                    lineHeight: `${ attributes.titleSize }px`,
-                                                                } }
+                                                                style={ getTypography( attributes, 1 ) }
                                                             />
                                                             <RichText
                                                                 tagName="p"
                                                                 placeholder={ __( 'Description', 'kenzap-timeline' ) }
                                                                 value={ item.description }
                                                                 onChange={ ( value ) => this.onChangePropertyItem( 'description', value, index, true ) }
-                                                                style={ {
-                                                                    color: attributes.textColor,
-                                                                    fontSize: `${ attributes.descriptionSize }px`,
-                                                                    lineHeight: `${ attributes.descriptionSize * 1.8 }px`,
-                                                                } }
+                                                                style={ getTypography( attributes, 2 ) }
                                                             />
                                                         </div>
                                                     </div>
@@ -226,8 +194,8 @@ export default class Edit extends Component {
                                         ) ) }
                                     </div>
                                 </div>
-
                             </div>
+                            { attributes.nestedBlocks == 'bottom' && <InnerBlocks /> }
                         </div>
                         <div className="editPadding" />
                         <button

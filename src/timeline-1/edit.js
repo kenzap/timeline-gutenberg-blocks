@@ -1,11 +1,10 @@
-const { __ } = wp.i18n; // Import __() from wp.i18n
+const { __ } = wp.i18n;
 const { Component } = wp.element;
-const { RichText, InspectorControls, PanelColorSettings } = wp.editor;
-const { RangeControl, PanelBody, CheckboxControl } = wp.components;
-
-import { defaultItem, getStyles } from './block';
-
+const { RichText, InspectorControls, PanelColorSettings, InnerBlocks } = wp.editor;
+const { PanelBody, CheckboxControl } = wp.components;
+import { defaultItem, typographyArr, getStyles } from './block';
 import { InspectorContainer, ContainerEdit } from '../commonComponents/container/container';
+import { TypographyContainer, getTypography } from '../commonComponents/typography/typography';
 import { Plus } from '../commonComponents/icons/plus';
 
 /**
@@ -82,7 +81,7 @@ export default class Edit extends Component {
 
         const { vars, kenzapContanerStyles } = getStyles( attributes );
 
-        const time = ( item, index ) => (
+        const time = ( item, index, attributes ) => (
             <div className="kenzap-col-6">
                 <div className="time">
                     <RichText
@@ -90,16 +89,13 @@ export default class Edit extends Component {
                         placeholder={ __( 'Time', 'kenzap-timeline' ) }
                         value={ item.time }
                         onChange={ ( value ) => this.onChangePropertyItem( 'time', value, index, true ) }
-                        style={ {
-                            color: attributes.textColor,
-                            fontSize: `${ attributes.timeSize }px`,
-                        } }
+                        style={ getTypography( attributes, 0 ) }
                     />
                 </div>
             </div>
         );
 
-        const info = ( item, index ) => (
+        const info = ( item, index, attributes ) => (
             <div className="kenzap-col-6">
                 <div className="info">
                     <RichText
@@ -107,22 +103,14 @@ export default class Edit extends Component {
                         placeholder={ __( 'Title', 'kenzap-timeline' ) }
                         value={ item.title }
                         onChange={ ( value ) => this.onChangePropertyItem( 'title', value, index, true ) }
-                        style={ {
-                            color: attributes.textColor,
-                            fontSize: `${ attributes.titleSize }px`,
-                            lineHeight: `${ attributes.titleSize * 1.34 }px`,
-                        } }
+                        style={ getTypography( attributes, 1 ) }
                     />
                     <RichText
                         tagName="p"
                         placeholder={ __( 'Description', 'kenzap-timeline' ) }
                         value={ item.description }
                         onChange={ ( value ) => this.onChangePropertyItem( 'description', value, index, true ) }
-                        style={ {
-                            color: attributes.textColor,
-                            fontSize: `${ attributes.descriptionSize }px`,
-                            lineHeight: `${ attributes.descriptionSize * 1.73 }px`,
-                        } }
+                        style={ getTypography( attributes, 2 ) }
                     />
                 </div>
             </div>
@@ -136,55 +124,33 @@ export default class Edit extends Component {
                         initialOpen={ false }
                     >
                         <CheckboxControl
-                            label={ __( 'Animation', 'kenzap-timeline' ) }
-                            help={ __( 'Enable/disable animation on hover event', 'kenzap-timeline' ) }
+                            label={ __( 'Hover animation', 'kenzap-timeline' ) }
                             checked={ attributes.withAnimation }
                             onChange={ ( withAnimation ) => {
                                 setAttributes( { withAnimation } );
                             } }
-                        />
-                        <RangeControl
-                            label={ __( 'Title size', 'kenzap-timeline' ) }
-                            value={ attributes.titleSize }
-                            onChange={ ( titleSize ) => setAttributes( { titleSize } ) }
-                            min={ 10 }
-                            max={ 130 }
-                        />
-                        <RangeControl
-                            label={ __( 'Description size', 'kenzap-timeline' ) }
-                            value={ attributes.descriptionSize }
-                            onChange={ ( descriptionSize ) => setAttributes( { descriptionSize } ) }
-                            min={ 10 }
-                            max={ 130 }
-                        />
-                        <RangeControl
-                            label={ __( 'Time size', 'kenzap-timeline' ) }
-                            value={ attributes.timeSize }
-                            onChange={ ( timeSize ) => setAttributes( { timeSize } ) }
-                            min={ 10 }
-                            max={ 130 }
                         />
                         <PanelColorSettings
                             title={ __( 'Colors', 'kenzap-timeline' ) }
                             initialOpen={ false }
                             colorSettings={ [
                                 {
-                                    value: attributes.textColor,
-                                    onChange: ( value ) => {
-                                        return setAttributes( { textColor: value } );
-                                    },
-                                    label: __( 'Text color', 'kenzap-timeline' ),
-                                },
-                                {
                                     value: attributes.timeLineColor,
                                     onChange: ( timeLineColor ) => {
                                         return setAttributes( { timeLineColor } );
                                     },
-                                    label: __( 'Element and circle color', 'kenzap-timeline' ),
+                                    label: __( 'Highlight', 'kenzap-timeline' ),
                                 },
                             ] }
                         />
                     </PanelBody>
+
+                    <TypographyContainer
+                        setAttributes={ setAttributes }
+                        typographyArr={ typographyArr }
+                        { ...attributes }
+                    />
+
                     <InspectorContainer
                         setAttributes={ setAttributes }
                         { ...attributes }
@@ -202,6 +168,7 @@ export default class Edit extends Component {
                         withPadding
                     >
                         <div className="kenzap-container" style={ kenzapContanerStyles }>
+                            { attributes.nestedBlocks == 'top' && <InnerBlocks /> }
                             <div className="timeline">
                                 { attributes.items && attributes.items.map( ( item, index ) => (
                                     <div
@@ -214,18 +181,19 @@ export default class Edit extends Component {
 
                                         { ( index + 1 ) % 2 !== 0 ? (
                                             <div className="kenzap-row">
-                                                { time( item, index ) }
-                                                { info( item, index ) }
+                                                { time( item, index, attributes ) }
+                                                { info( item, index, attributes ) }
                                             </div>
                                         ) : (
                                             <div className="kenzap-row">
-                                                { info( item, index ) }
-                                                { time( item, index ) }
+                                                { info( item, index, attributes ) }
+                                                { time( item, index, attributes ) }
                                             </div>
                                         ) }
                                     </div>
                                 ) ) }
                             </div>
+                            { attributes.nestedBlocks == 'bottom' && <InnerBlocks /> }
                         </div>
                         <div className="editPadding" />
                         <button

@@ -254,11 +254,11 @@
 
 .kenzap .kenzap-timeline-4 .timeline .timeline-content .time strong{
   margin:0;
-  color:var(--textColor);
-  font-size:16px;
-  line-height:16px;
-  font-weight:300;
-  opacity:0.5
+  // color:var(--textColor);
+  // font-size:16px;
+  // line-height:16px;
+  // font-weight:300;
+  //opacity:0.5
 }
 
 .kenzap .kenzap-timeline-4 .timeline .timeline-content.current-time .time strong{
@@ -267,15 +267,15 @@
 
 .kenzap .kenzap-timeline-4 .timeline .timeline-content .info h3{
   margin:0;
-  color: var(--textColor);
-  font-size:14px;
-  line-height:18px;
-  font-weight:700;
+  // color: var(--textColor);
+  // font-size:14px;
+  // line-height:18px;
+  // font-weight:700;
   text-align:center
 }
 
 .kenzap .kenzap-timeline-4 .timeline .timeline-content.current-time .info h3{
-  color: var(--backgroundColor)
+  color: var(--backgroundColor)!important;
 }
 
 

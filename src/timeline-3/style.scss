@@ -8,8 +8,9 @@
 
 .kenzap .kenzap-timeline-3 .kenzap-container {
   max-width: 1780px;
-  padding: 0 15px;
+  padding: 0 var(--paddings2,0);
   margin: 0 auto;
+  overflow-x: hidden;
 }
 
 .kenzap .kenzap-timeline-3.autoPadding {

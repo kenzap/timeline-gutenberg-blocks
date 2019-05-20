@@ -1,17 +1,11 @@
-/**
- * BLOCK: timeline-4
- *
- */
-
-//  Import CSS.
 import './style.scss';
 import './editor.scss';
 
 const { __ } = wp.i18n;
 const { registerBlockType } = wp.blocks;
-const { RichText } = wp.editor;
-
+const { RichText, InnerBlocks } = wp.editor;
 import { blockProps, ContainerSave } from '../commonComponents/container/container';
+import { getTypography } from '../commonComponents/typography/typography';
 import Edit from './edit';
 
 /**
@@ -66,6 +60,30 @@ export const defaultSubBlocks = JSON.stringify( [
 ] );
 
 /**
+ * Define typography defaults
+ */
+export const typographyArr = JSON.stringify([
+    {
+        'title': __( '- Time', 'kenzap-timeline' ),
+        'font-size': 16,
+
+        
+        'font-weight': 4,
+        'line-height': 16,
+        'margin-bottom': 0,
+        'color': '#ffffff',
+    },
+    {
+        'title': __( '- Title', 'kenzap-timeline' ),
+        'font-size': 15,
+        'font-weight': 5,
+        'line-height': 18,
+        'margin-bottom': 0,
+        'color': '#ffffff',
+    },
+]);
+
+/**
  * Generate inline styles for custom settings of the block
  * @param {Object} attributes - of the block
  * @returns {Node} generated styles
@@ -78,10 +96,8 @@ export const getStyles = attributes => {
 
     const vars = {
         '--paddings': `${ attributes.containerPadding }`,
-        '--paddingsMin': `${ attributes.containerPadding / 4 }`,
-        '--paddingsMinPx': `${ attributes.containerPadding / 4 }px`,
+        '--paddings2': `${ attributes.containerSidePadding }px`,
         '--textColor': attributes.textColor,
-        '--timeLineColor': attributes.timeLineColor,
         '--borderRadius': `${ attributes.borderRadius }px`,
         '--backgroundColor': attributes.backgroundColor,
     };
@@ -130,32 +146,20 @@ registerBlockType( 'kenzap/timeline-4', {
     ],
     anchor: true,
     html: true,
+    supports: {
+        align: [ 'full', 'wide' ],
+    },
     attributes: {
         ...blockProps,
 
-        backgroundColor: {
+        align: {
             type: 'string',
-            default: '#546eff',
-        },
-
-        titleSize: {
-            type: 'number',
-            default: 14,
-        },
-
-        timeSize: {
-            type: 'number',
-            default: 16,
+            default: 'full',
         },
 
         textColor: {
             type: 'string',
-            default: '#fff',
-        },
-
-        timeLineColor: {
-            type: 'string',
-            default: '#fff',
+            //default: '#fff',
         },
 
         borderRadius: {
@@ -169,6 +173,11 @@ registerBlockType( 'kenzap/timeline-4', {
         },
 
         items: {
+            type: 'array',
+            default: [],
+        },
+
+        typography: {
             type: 'array',
             default: [],
         },
@@ -194,8 +203,10 @@ registerBlockType( 'kenzap/timeline-4', {
             props.setAttributes( {
                 items: [ ...JSON.parse( defaultSubBlocks ) ],
                 isFirstLoad: false,
+                backgroundColor: '#546eff',
+                textColor: '#ffffff'
             } );
-            // TODO It is very bad solution to avoid low speed working of setAttributes function
+
             props.attributes.items = JSON.parse( defaultSubBlocks );
             if ( ! props.attributes.blockUniqId ) {
                 props.setAttributes( {
@@ -233,6 +244,7 @@ registerBlockType( 'kenzap/timeline-4', {
                     withPadding
                 >
                     <div className="kenzap-container" style={ kenzapContanerStyles }>
+                        { attributes.nestedBlocks == 'top' && <InnerBlocks.Content /> }
                         <div className={ `timeline owl-carousel ${ additionalClassForOwlContainer }` }>
                             { attributes.items && attributes.items.map( ( item, index ) => (
                                 <div
@@ -244,10 +256,7 @@ registerBlockType( 'kenzap/timeline-4', {
                                             <RichText.Content
                                                 tagName="p"
                                                 value={ item.time }
-                                                style={ {
-                                                    fontSize: `${ attributes.timeSize }px`,
-                                                    lineHeight: `${ attributes.timeSize }px`,
-                                                } }
+                                                style={ getTypography( attributes, 0 ) }
                                             />
                                         </div>
                                     </div>
@@ -256,15 +265,14 @@ registerBlockType( 'kenzap/timeline-4', {
                                             <RichText.Content
                                                 tagName="h3"
                                                 value={ item.title }
-                                                style={ {
-                                                    fontSize: `${ attributes.titleSize }px`,
-                                                } }
+                                                style={ getTypography( attributes, 1 ) }
                                             />
                                         </div>
                                     </div>
                                 </div>
                             ) ) }
                         </div>
+                        { attributes.nestedBlocks == 'bottom' && <InnerBlocks.Content /> }
                     </div>
                 </ContainerSave>
             </div>

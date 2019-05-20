@@ -3,7 +3,7 @@
 Plugin Name: Kenzap Timeline
 Description: Easily create and customize Timeline blocks on your website
 Author: Kenzap
-Version: 1.0.0
+Version: 1.1.0
 Author URI: http://kenzap.com
 License: GPL2+
 License URI: http://www.gnu.org/licenses/gpl-2.0.txt

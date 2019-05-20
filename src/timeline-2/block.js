@@ -1,17 +1,11 @@
-/**
- * BLOCK: timeline-2
- *
- */
-
-//  Import CSS.
 import './style.scss';
 import './editor.scss';
 
 const { __ } = wp.i18n;
 const { registerBlockType } = wp.blocks;
 const { RichText } = wp.editor;
-
 import { blockProps, ContainerSave } from '../commonComponents/container/container';
+import { getTypography } from '../commonComponents/typography/typography';
 import Edit from './edit';
 
 /**
@@ -58,8 +52,7 @@ export const getStyles = attributes => {
 
     const vars = {
         '--paddings': `${ attributes.containerPadding }`,
-        '--paddingsMin': `${ attributes.containerPadding / 4 }`,
-        '--paddingsMinPx': `${ attributes.containerPadding / 4 }px`,
+        '--paddings2': `${ attributes.containerSidePadding }px`,
         '--verticalLineAndDotsColor': attributes.verticalLineAndDotsColor,
     };
 
@@ -68,6 +61,27 @@ export const getStyles = attributes => {
         kenzapContanerStyles,
     };
 };
+
+/**
+ * Define typography defaults
+ */
+export const typographyArr = JSON.stringify([
+    {
+        'title': __( '- Title', 'kenzap-timeline' ),
+        'font-size': 16,
+        'font-weight': 4,
+        'line-height': 16,
+        'margin-bottom': 20,
+        'color': '#ffffff',
+    },
+    {
+        'title': __( '- Description', 'kenzap-timeline' ),
+        'font-size': 14,
+        'font-weight': 4,
+        'line-height': 24,
+        'color': '#ffffff',
+    },
+]);
 
 /**
  * Register: a Gutenberg Block.
@@ -91,35 +105,23 @@ registerBlockType( 'kenzap/timeline-2', {
     ],
     anchor: true,
     html: true,
+    supports: {
+        align: [ 'full', 'wide' ],
+    },
     attributes: {
         ...blockProps,
 
-        backgroundColor: {
-            type: 'string',
-            default: '#151515',
-        },
-
-        titleSize: {
-            type: 'number',
-            default: 16,
-        },
-
-        descriptionSize: {
-            type: 'number',
-            default: 14,
-        },
-
-        textColor: {
-            type: 'string',
-            default: '#fff',
-        },
-
         verticalLineAndDotsColor: {
             type: 'string',
-            default: '#fff',
+            //default: '#fff',
         },
 
         items: {
+            type: 'array',
+            default: [],
+        },
+
+        typography: {
             type: 'array',
             default: [],
         },
@@ -140,8 +142,10 @@ registerBlockType( 'kenzap/timeline-2', {
             props.setAttributes( {
                 items: [ ...JSON.parse( defaultSubBlocks ) ],
                 isFirstLoad: false,
+                backgroundColor: '#151515',
+                verticalLineAndDotsColor: '#fff'
             } );
-            // TODO It is very bad solution to avoid low speed working of setAttributes function
+
             props.attributes.items = JSON.parse( defaultSubBlocks );
             if ( ! props.attributes.blockUniqId ) {
                 props.setAttributes( {
@@ -192,20 +196,12 @@ registerBlockType( 'kenzap/timeline-2', {
                                                 <RichText.Content
                                                     tagName="h3"
                                                     value={ item.title }
-                                                    style={ {
-                                                            color: attributes.textColor,
-                                                            fontSize: `${ attributes.titleSize }px`,
-                                                            lineHeight: '1',
-                                                        } }
+                                                    style={ getTypography( attributes, 0 ) }
                                                     />
                                                 <RichText.Content
                                                     tagName="p"
                                                     value={ item.description }
-                                                    style={ {
-                                                            color: attributes.textColor,
-                                                            fontSize: `${ attributes.descriptionSize }px`,
-                                                            lineHeight: '1.72',
-                                                        } }
+                                                    style={ getTypography( attributes, 1 ) }
                                                     />
                                             </div>
                                         </div>

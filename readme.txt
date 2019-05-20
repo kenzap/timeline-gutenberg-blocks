@@ -2,8 +2,8 @@ Kenzap Timeline
 Contributors: kenzap
 Tags: timeline, progress, roadmap
 Requires at least: 5.0
-Tested up to: 5.1
-Stable tag: 1.0.0
+Tested up to: 5.2
+Stable tag: 1.1.0
 Donate link: https://kenzap.com/wordpress-plugin-donation-page/
 Requires PHP: 5.6
 License: GPL2+
@@ -66,3 +66,11 @@ This is a first release
 
 = v1.0.0 =
 New: Initial release
+
+= v1.0.1 =
+New: Align wide and full support
+
+= v1.1.0 =
+New: Typography settings introduced
+Update: Code clean up
+Update: CSS improvements

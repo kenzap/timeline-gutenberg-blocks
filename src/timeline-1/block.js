@@ -1,17 +1,11 @@
-/**
- * BLOCK: timeline-1
- *
- */
-
-//  Import CSS.
 import './style.scss';
 import './editor.scss';
 
 const { __ } = wp.i18n;
 const { registerBlockType } = wp.blocks;
-const { RichText } = wp.editor;
-
+const { RichText, InnerBlocks } = wp.editor;
 import { blockProps, ContainerSave } from '../commonComponents/container/container';
+import { getTypography } from '../commonComponents/typography/typography';
 import Edit from './edit';
 
 /**
@@ -23,7 +17,7 @@ export const defaultItem = {
     time: `10.00${ __( 'am' ) } - 11.00${ __( 'am' ) }`,
 };
 
-export const defaultSubBlocks = JSON.stringify( [
+export const defaultSubBlocks = JSON.stringify([
     {
         title: __( 'Registration', 'kenzap-timeline' ),
         description: __( 'Visit ticket counters to register or print your badge. Please download app in advance.', 'kenzap-timeline' ),
@@ -57,6 +51,35 @@ export const defaultSubBlocks = JSON.stringify( [
 ] );
 
 /**
+ * Define typography defaults
+ */
+export const typographyArr = JSON.stringify([
+    {
+        'title': __( '- Time', 'kenzap-timeline' ),
+        'font-size': 18,
+        'font-weight': 5,
+        'line-height': 24,
+        'margin-bottom': 10,
+        'color': '#333333',
+    },
+    {
+        'title': __( '- Title', 'kenzap-timeline' ),
+        'font-size': 18,
+        'font-weight': 5,
+        'line-height': 24,
+        'margin-bottom': 8,
+        'color': '#333333',
+    },
+    {
+        'title': __( '- Description', 'kenzap-timeline' ),
+        'font-size': 14,
+        'font-weight': 4,
+        'line-height': 24,
+        'color': '#333333',
+    },
+]);
+
+/**
  * Generate inline styles for custom settings of the block
  * @param {Object} attributes - of the block
  * @returns {Node} generated styles
@@ -69,8 +92,7 @@ export const getStyles = attributes => {
 
     const vars = {
         '--paddings': `${ attributes.containerPadding }`,
-        '--paddingsMin': `${ attributes.containerPadding / 4 }`,
-        '--paddingsMinPx': `${ attributes.containerPadding / 4 }px`,
+        '--paddings2': `${ attributes.containerSidePadding }px`,
         '--timeLineColor': attributes.timeLineColor,
     };
 
@@ -102,6 +124,9 @@ registerBlockType( 'kenzap/timeline-1', {
     ],
     anchor: true,
     html: true,
+    supports: {
+        align: [ 'full', 'wide' ],
+    },
     attributes: {
         ...blockProps,
 
@@ -120,14 +145,9 @@ registerBlockType( 'kenzap/timeline-1', {
             default: 18,
         },
 
-        textColor: {
-            type: 'string',
-            default: '#000',
-        },
-
         timeLineColor: {
             type: 'string',
-            default: '#ec2778',
+            //default: '#ec2778',
         },
 
         withAnimation: {
@@ -136,6 +156,11 @@ registerBlockType( 'kenzap/timeline-1', {
         },
 
         items: {
+            type: 'array',
+            default: [],
+        },
+
+        typography: {
             type: 'array',
             default: [],
         },
@@ -156,8 +181,9 @@ registerBlockType( 'kenzap/timeline-1', {
             props.setAttributes( {
                 items: [ ...JSON.parse( defaultSubBlocks ) ],
                 isFirstLoad: false,
+                timeLineColor: '#ec2778',
             } );
-            // TODO It is very bad solution to avoid low speed working of setAttributes function
+
             props.attributes.items = JSON.parse( defaultSubBlocks );
             if ( ! props.attributes.blockUniqId ) {
                 props.setAttributes( {
@@ -185,43 +211,32 @@ registerBlockType( 'kenzap/timeline-1', {
 
         const { vars, kenzapContanerStyles } = getStyles( props.attributes );
 
-        const time = ( item ) => (
+        const time = ( item, attributes ) => (
             <div className="kenzap-col-6">
 
                 <div className="time">
                     <RichText.Content
                         tagName="div"
                         value={ item.time }
-                        style={ {
-                            color: attributes.textColor,
-                            fontSize: `${ attributes.timeSize }px`,
-                        } }
+                        style={ getTypography( attributes, 0 ) }
                     />
                 </div>
             </div>
         );
 
-        const info = ( item ) => (
+        const info = ( item, attributes ) => (
             <div className="kenzap-col-6">
                 <div className="info">
 
                     <RichText.Content
                         tagName="h3"
                         value={ item.title }
-                        style={ {
-                            color: attributes.textColor,
-                            fontSize: `${ attributes.titleSize }px`,
-                            lineHeight: `${ attributes.titleSize * 1.34 }px`,
-                        } }
+                        style={ getTypography( attributes, 1 ) }
                     />
                     <RichText.Content
                         tagName="p"
                         value={ item.description }
-                        style={ {
-                            color: attributes.textColor,
-                            fontSize: `${ attributes.descriptionSize }px`,
-                            lineHeight: `${ attributes.descriptionSize * 1.73 }px`,
-                        } }
+                        style={ getTypography( attributes, 2 ) }
                     />
                 </div>
             </div>
@@ -237,6 +252,7 @@ registerBlockType( 'kenzap/timeline-1', {
                     withPadding
                 >
                     <div className="kenzap-container" style={ kenzapContanerStyles }>
+                        { attributes.nestedBlocks == 'top' && <InnerBlocks.Content /> }
                         <div className="timeline">
                             { attributes.items && attributes.items.map( ( item, index ) => (
                                 <div
@@ -245,18 +261,19 @@ registerBlockType( 'kenzap/timeline-1', {
                                 >
                                     { ( index + 1 ) % 2 !== 0 ? (
                                         <div className="kenzap-row">
-                                            { time( item ) }
-                                            { info( item ) }
+                                            { time( item, attributes ) }
+                                            { info( item, attributes ) }
                                         </div>
                                     ) : (
                                         <div className="kenzap-row">
-                                            { info( item ) }
-                                            { time( item ) }
+                                            { info( item, attributes ) }
+                                            { time( item, attributes ) }
                                         </div>
                                     ) }
                                 </div>
                             ) ) }
                         </div>
+                        { attributes.nestedBlocks == 'bottom' && <InnerBlocks.Content /> }
                     </div>
                 </ContainerSave>
             </div>

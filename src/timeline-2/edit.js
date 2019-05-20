@@ -1,11 +1,10 @@
-const { __ } = wp.i18n; // Import __() from wp.i18n
+const { __ } = wp.i18n;
 const { Component } = wp.element;
 const { RichText, InspectorControls, PanelColorSettings } = wp.editor;
 const { RangeControl, PanelBody } = wp.components;
-
-import { defaultItem, getStyles } from './block';
-
+import { defaultItem, typographyArr, getStyles } from './block';
 import { InspectorContainer, ContainerEdit } from '../commonComponents/container/container';
+import { TypographyContainer, getTypography } from '../commonComponents/typography/typography';
 import { Plus } from '../commonComponents/icons/plus';
 
 /**
@@ -85,45 +84,26 @@ export default class Edit extends Component {
         return (
             <div>
                 <InspectorControls>
-                    <PanelBody
-                        title={ __( 'General', 'kenzap-timeline' ) }
+                    <PanelColorSettings
+                        title={ __( 'Colors', 'kenzap-timeline' ) }
                         initialOpen={ false }
-                    >
-                        <RangeControl
-                            label={ __( 'Title size', 'kenzap-timeline' ) }
-                            value={ attributes.titleSize }
-                            onChange={ ( titleSize ) => setAttributes( { titleSize } ) }
-                            min={ 10 }
-                            max={ 130 }
-                        />
-                        <RangeControl
-                            label={ __( 'Description size', 'kenzap-timeline' ) }
-                            value={ attributes.descriptionSize }
-                            onChange={ ( descriptionSize ) => setAttributes( { descriptionSize } ) }
-                            min={ 10 }
-                            max={ 130 }
-                        />
-                        <PanelColorSettings
-                            title={ __( 'Colors', 'kenzap-timeline' ) }
-                            initialOpen={ false }
-                            colorSettings={ [
-                                {
-                                    value: attributes.textColor,
-                                    onChange: ( value ) => {
-                                        return setAttributes( { textColor: value } );
-                                    },
-                                    label: __( 'Text color', 'kenzap-timeline' ),
+                        colorSettings={ [
+                            {
+                                value: attributes.verticalLineAndDotsColor,
+                                onChange: ( verticalLineAndDotsColor ) => {
+                                    return setAttributes( { verticalLineAndDotsColor } );
                                 },
-                                {
-                                    value: attributes.verticalLineAndDotsColor,
-                                    onChange: ( verticalLineAndDotsColor ) => {
-                                        return setAttributes( { verticalLineAndDotsColor } );
-                                    },
-                                    label: __( 'Vertical line and dots colors', 'kenzap-timeline' ),
-                                },
-                            ] }
-                        />
-                    </PanelBody>
+                                label: __( 'Highlight', 'kenzap-timeline' ),
+                            },
+                        ] }
+                    />
+
+                    <TypographyContainer
+                        setAttributes={ setAttributes }
+                        typographyArr={ typographyArr }
+                        { ...attributes }
+                    />
+
                     <InspectorContainer
                         setAttributes={ setAttributes }
                         { ...attributes }
@@ -160,22 +140,14 @@ export default class Edit extends Component {
                                                         placeholder={ __( 'Title', 'kenzap-timeline' ) }
                                                         value={ item.title }
                                                         onChange={ ( value ) => this.onChangePropertyItem( 'title', value, index, true ) }
-                                                        style={ {
-                                                            color: attributes.textColor,
-                                                            fontSize: `${ attributes.titleSize }px`,
-                                                            lineHeight: '1',
-                                                        } }
+                                                        style={ getTypography( attributes, 0 ) }
                                                     />
                                                     <RichText
                                                         tagName="p"
                                                         placeholder={ __( 'Description', 'kenzap-timeline' ) }
                                                         value={ item.description }
                                                         onChange={ ( value ) => this.onChangePropertyItem( 'description', value, index, true ) }
-                                                        style={ {
-                                                            color: attributes.textColor,
-                                                            fontSize: `${ attributes.descriptionSize }px`,
-                                                            lineHeight: '1.72',
-                                                        } }
+                                                        style={ getTypography( attributes, 1 ) }
                                                     />
                                                 </div>
                                             </div>

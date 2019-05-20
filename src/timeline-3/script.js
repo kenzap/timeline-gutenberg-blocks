@@ -41,66 +41,66 @@ jQuery( document ).ready( function() {
 	} );
 
     jQuery( '.kenzap .kenzap-timeline-3 .kenzap-md-carousel' ).owlCarousel( {
-		autoplay: false,
-		loop: false,
-		margin: 0,
-		dots: false,
-		mouseDrag: false,
-		slideBy: 1,
-		nav: true,
-		responsive: {
-			0: {
-				items: 1,
+			autoplay: false,
+			loop: false,
+			margin: 0,
+			dots: false,
+			mouseDrag: false,
+			slideBy: 1,
+			nav: true,
+			responsive: {
+				0: {
+					items: 1,
+				},
+				500: {
+					items: 1,
+				},
+				609: {
+					items: 2,
+				},
+				768: {
+					items: 2,
+				},
+				991: {
+					items: 3,
+				},
 			},
-			500: {
-				items: 1,
-			},
-			609: {
-				items: 2,
-			},
-			768: {
-				items: 2,
-			},
-			991: {
-				items: 3,
-			},
-		},
-	} );
+		} );
 
     jQuery( '.kenzap .kenzap-timeline-3 .kenzap-sm-carousel' ).owlCarousel( {
-		autoplay: false,
-		loop: false,
-		margin: 0,
-		dots: false,
-		mouseDrag: false,
-		slideBy: 1,
-		nav: true,
-		responsive: {
-			0: {
-				items: 1,
+			autoplay: false,
+			loop: false,
+			margin: 0,
+			dots: false,
+			mouseDrag: false,
+			slideBy: 1,
+			nav: true,
+			responsive: {
+				0: {
+					items: 1,
+				},
+				500: {
+					items: 1,
+				},
+				609: {
+					items: 2,
+				},
 			},
-			500: {
-				items: 1,
-			},
-			609: {
-				items: 2,
-			},
-		},
-	} );
+		} );
 
     jQuery( '.kenzap .kenzap-timeline-3 .kenzap-xs-carousel' ).owlCarousel( {
-		autoplay: false,
-		loop: false,
-		margin: 0,
-		dots: false,
-		mouseDrag: false,
-		slideBy: 1,
-		nav: true,
-		responsive: {
-			0: {
-				items: 1,
+			autoplay: false,
+			loop: false,
+			margin: 0,
+			dots: false,
+			mouseDrag: false,
+			slideBy: 1,
+			nav: true,
+			responsive: {
+				0: {
+					items: 1,
+				},
 			},
-		},
-	} );
+		} );
 } );
 
