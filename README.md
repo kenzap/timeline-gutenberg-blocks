@@ -4,7 +4,7 @@ Create beautiful brands section on your website.
 To be used with WordPress Gutenberg.
 
 
-![Create beatiful timeline or roadmap section with Gutenberg](https://kenzap.com/website/img/timeline-3.png)
+![Create beatiful timeline or roadmap section with Gutenberg](https://cdn.kenzap.com/github/img/timeline-3.png)
 
 <b>Block is easy customizable:</b>
 
